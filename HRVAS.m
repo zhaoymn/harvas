@@ -1625,6 +1625,8 @@ function HRVAS
     end
 
     function btnqu_Callback(hObject, eventdata)
+        firstplot = 0;
+        showpos = 1;
         f=strtrim(get(h.txtFile,'String'));
         if ~isempty(f) || ~exist(f,'file')
             settings=getSettings; %get HRV options from gui
@@ -2082,25 +2084,10 @@ function HRVAS
         %xlim = [slidervalue/500 slidervalue/500+showlength];
         
         axes(h.axesECG);
-        
-        pt = get(gca,'CurrentPoint');
-        x = pt(1,1) + showpos;
-        y = pt(1,2);
-        
-        
-        %x0tick=get(h.axesECG,'xtick');
-        %x0ticklabel=cell(length(x0tick),1);
-        %for i=1:length(x0tick)
-        %    x0ticklabel{i} = ...
-        %        datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
-        %end
-        %set(h.axesECG,'xlim',xlim,'xtick',x0tick);
         delete(cover);
         axes(h.axesIBI);
         
         hold(h.axesIBI,'on');
-        size(ECG,1)
-        showlength/size(ECG,1)
         if showlength/size(ECG,1) < 0.5e-5
             x1 = [slidervalue/500,slidervalue/500,slidervalue/500+size(ECG,1)*0.000005,slidervalue/500+size(ECG,1)*0.000005];
         else
@@ -2109,8 +2096,6 @@ function HRVAS
         y1 = [bgymax, bgymin, bgymin, bgymax];
         cover = fill(x1,y1,'r','FaceAlpha',0.2,'edgealpha',0);
         hold(h.axesIBI,'off');
-        %set(h.axesIBI,'xlim',xlim,'xtick',x0tick);
-        lastslidervalue = slidervalue;
     end
     function ButttonDownFcn(src,event)
         if strcmp(get(gcf,'SelectionType'),'alt')
@@ -2143,7 +2128,7 @@ function HRVAS
                 axes(h.axesECG);
                 cla reset
                 plotQRS(h,ECG);
-                RefreshPosition();
+                %RefreshPosition();
             end
             
             RR=[];
@@ -2176,7 +2161,7 @@ function HRVAS
             axes(h.axesECG);
             cla reset
             plotQRS(h,ECG);
-            RefreshPosition();
+            %RefreshPosition();
             
             
             RR=[];
