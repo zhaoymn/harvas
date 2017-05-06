@@ -54,6 +54,7 @@ function HRVAS
     global sample_covers
     global analyze_ibi analyze_nIBI analyze_dIBI;
     global analyze_ecg;
+    global showpos;
     analyze_ecg = [];
     sample_covers = [];
     sample_selected = 0;
@@ -77,7 +78,7 @@ function HRVAS
     nowstate=0;
     firstplot = 0;
     showlength = 30;
-    
+    showpos = 1;
 
     %% GUI: Main Figure
     
@@ -2042,22 +2043,23 @@ function HRVAS
         if slidervalue == lastslidervalue
             return;
         end
-        xlim = [slidervalue/500 slidervalue/500+showlength];
-        
+        %xlim = [slidervalue/500 slidervalue/500+showlength];
+        showpos = slidervalue
         axes(h.axesECG);
+        cla reset
+        plotQRS(h,ECG);
+        %pt = get(gca,'CurrentPoint');
+        %x = pt(1,1);
+        %y = pt(1,2);
         
-        pt = get(gca,'CurrentPoint');
-        x = pt(1,1);
-        y = pt(1,2);
         
-        
-        x0tick=get(h.axesECG,'xtick');
-        x0ticklabel=cell(length(x0tick),1);
-        for i=1:length(x0tick)
-            x0ticklabel{i} = ...
-                datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
-        end
-        set(h.axesECG,'xlim',xlim,'xtick',x0tick);
+        %x0tick=get(h.axesECG,'xtick');
+        %x0ticklabel=cell(length(x0tick),1);
+        %for i=1:length(x0tick)
+        %    x0ticklabel{i} = ...
+        %        datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
+        %end
+        %set(h.axesECG,'xlim',xlim,'xtick',x0tick);
         delete(cover);
         axes(h.axesIBI);
         
@@ -2077,22 +2079,22 @@ function HRVAS
 
     function RefreshPosition
         slidervalue = get(h.slidercontrol,'value');
-                xlim = [slidervalue/500 slidervalue/500+showlength];
+        %xlim = [slidervalue/500 slidervalue/500+showlength];
         
         axes(h.axesECG);
         
         pt = get(gca,'CurrentPoint');
-        x = pt(1,1);
+        x = pt(1,1) + showpos;
         y = pt(1,2);
         
         
-        x0tick=get(h.axesECG,'xtick');
-        x0ticklabel=cell(length(x0tick),1);
-        for i=1:length(x0tick)
-            x0ticklabel{i} = ...
-                datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
-        end
-        set(h.axesECG,'xlim',xlim,'xtick',x0tick);
+        %x0tick=get(h.axesECG,'xtick');
+        %x0ticklabel=cell(length(x0tick),1);
+        %for i=1:length(x0tick)
+        %    x0ticklabel{i} = ...
+        %        datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
+        %end
+        %set(h.axesECG,'xlim',xlim,'xtick',x0tick);
         delete(cover);
         axes(h.axesIBI);
         
@@ -2138,7 +2140,8 @@ function HRVAS
                 size(qrs_i_raw)                
                 qrs_time_raw = [qrs_time_raw(1:t-1) qrs_time_raw(t+1:end)];
                 qrs_i_raw = [qrs_i_raw(1:t-1);qrs_i_raw(t+1:end)];
-          
+                axes(h.axesECG);
+                cla reset
                 plotQRS(h,ECG);
                 RefreshPosition();
             end
@@ -2170,7 +2173,12 @@ function HRVAS
             x = (i_new-1)/sample_rate;
             qrs_time_raw = [qrs_time_raw(1:posx) x qrs_time_raw(posx+1:end)];
             qrs_i_raw = [qrs_i_raw(1:posx);i_raw;qrs_i_raw(posx+1:end)];
-            plot(h.axesECG,x,ECG(i_raw,2),'r+');
+            axes(h.axesECG);
+            cla reset
+            plotQRS(h,ECG);
+            RefreshPosition();
+            
+            
             RR=[];
             for i=2:length(qrs_time_raw)
                 RR(i-1)=abs(qrs_time_raw(i)-qrs_time_raw(i-1));
@@ -3109,8 +3117,8 @@ function HRVAS
 %         if strcmpi(opt.ArtReplace,'none') %highlight Artifacts
             %t0=zeros(length(ECG),1);
             %y0=zeros(length(ECG),1);
-            t0=ECG(:,1);
-            y0=ECG(:,2);
+            t0=ECG(showpos:showpos+showlength*sample_rate,1);
+            y0=ECG(showpos:showpos+showlength*sample_rate,2);
 %             linecolor='y';
 %         else %plot preprocessed ibi            
 %             if ~strcmpi(opt.ArtReplace,'remove')
@@ -3137,7 +3145,7 @@ function HRVAS
         %hold(h.axesECG,'off');
         if length(y0)>sample_rate*showlength && firstplot == 0
             
-            set(h.slidercontrol,'value',1,'max',length(y0)-sample_rate*showlength,'min',1,'Enable','on',...
+            set(h.slidercontrol,'value',1,'max',length(ECG(:,1))-sample_rate*showlength,'min',1,'Enable','on',...
                 'callback',@slidermove);
             start(h.slidertimer);
             firstplot = 1;
