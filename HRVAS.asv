@@ -216,15 +216,24 @@ function HRVAS
         else
             showpos = showpos - showlength/6*sample_rate;
         end
-        slidervalue = showpos;
         axes(h.axesECG);
         cla reset
         plotQRS(h,ECG);
-        h.slidercontrol.set('value',slidervalue);
+        %pt = get(gca,'CurrentPoint');
+        %x = pt(1,1);
+        %y = pt(1,2);
+        
+        
+        %x0tick=get(h.axesECG,'xtick');
+        %x0ticklabel=cell(length(x0tick),1);
+        %for i=1:length(x0tick)
+        %    x0ticklabel{i} = ...
+        %        datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
+        %end
+        %set(h.axesECG,'xlim',xlim,'xtick',x0tick);
+        delete(cover);
         axes(h.axesIBI);
-        cla reset
-        plotIBI(h,settings,IBI,dIBI,nIBI,trend,art);
-        showStatus('');
+        
         hold(h.axesIBI,'on');
         if showlength/size(ECG,1) < 0.5e-5
             x1 = [slidervalue/500,slidervalue/500,slidervalue/500+size(ECG,1)*0.000005,slidervalue/500+size(ECG,1)*0.000005];
@@ -234,6 +243,7 @@ function HRVAS
         y1 = [bgymax, bgymin, bgymin, bgymax];
         cover = fill(x1,y1,'r','FaceAlpha',0.2,'edgealpha',0);
         hold(h.axesIBI,'off');
+        %set(h.axesIBI,'xlim',xlim,'xtick',x0tick);
         lastslidervalue = slidervalue;
     end
 
@@ -243,25 +253,6 @@ function HRVAS
         else
             showpos = showpos + showlength/6*sample_rate;
         end
-        slidervalue = showpos;
-        axes(h.axesECG);
-        cla reset
-        plotQRS(h,ECG);
-        h.slidercontrol.set('value',slidervalue);
-        axes(h.axesIBI);
-        cla reset
-        plotIBI(h,settings,IBI,dIBI,nIBI,trend,art);
-        showStatus('');
-        hold(h.axesIBI,'on');
-        if showlength/size(ECG,1) < 0.5e-5
-            x1 = [slidervalue/500,slidervalue/500,slidervalue/500+size(ECG,1)*0.000005,slidervalue/500+size(ECG,1)*0.000005];
-        else
-            x1 = [slidervalue/500,slidervalue/500,slidervalue/500+showlength,slidervalue/500+showlength];
-        end
-        y1 = [bgymax, bgymin, bgymin, bgymax];
-        cover = fill(x1,y1,'r','FaceAlpha',0.2,'edgealpha',0);
-        hold(h.axesIBI,'off');
-        lastslidervalue = slidervalue;
         
     end
     
@@ -2125,11 +2116,9 @@ function HRVAS
         %        datestr(datenum(num2str(x0tick(i)),'SS'),'HH:MM:SS');
         %end
         %set(h.axesECG,'xlim',xlim,'xtick',x0tick);
+        delete(cover);
         axes(h.axesIBI);
         
-        cla reset
-        plotIBI(h,settings,IBI,dIBI,nIBI,trend,art);
-        showStatus('');
         hold(h.axesIBI,'on');
         if showlength/size(ECG,1) < 0.5e-5
             x1 = [slidervalue/500,slidervalue/500,slidervalue/500+size(ECG,1)*0.000005,slidervalue/500+size(ECG,1)*0.000005];
@@ -3197,7 +3186,6 @@ function HRVAS
         %hold(h.axesECG,'off');
         if length(y0)>sample_rate*showlength && firstplot == 0
             set(h.slidercontrol,'value',1,'max',length(ECG(:,1))-sample_rate*showlength,'min',1,'Enable','on',...
-                'sliderstep',[showlength*sample_rate/length(ECG(:,1))/6,showlength/length(ECG(:,1))],...
                 'callback',@slidermove);
             stop(h.slidertimer);
             start(h.slidertimer);
