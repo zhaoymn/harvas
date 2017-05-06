@@ -1,0 +1,17 @@
+clc;clear;
+val1=importdata('chenzecheng_00_1h_V5_0_00_0_59.txt');
+val2=importdata('chenzecheng_00_1h_V5_1_00_1_59.txt');
+val3=importdata('chenzecheng_00_1h_V5_2_00_2_59.txt');
+val4=importdata('chenzecheng_00_1h_V5_3_00_3_59.txt');
+val5=importdata('chenzecheng_00_1h_V5_4_00_4_59.txt');
+val6=importdata('chenzecheng_00_1h_V5_5_00_5_59.txt');
+val7=importdata('chenzecheng_00_1h_V5_6_00_6_59.txt');
+val8=importdata('chenzecheng_00_1h_V5_7_00_7_59.txt');
+val9=importdata('chenzecheng_00_1h_V5_8_00_8_59.txt');
+val10=importdata('chenzecheng_00_1h_V5_9_00_9_59.txt');
+val11=importdata('chenzecheng_00_1h_V5_10_00_10_59.txt');
+val12=importdata('chenzecheng_00_1h_V5_11_00_11_59.txt');
+val=[val1;val2;val3;val4;val5;val6;val7;val8;val9;val10;val11;val12];
+datafile = fopen('chenzecheng_00_V5_12h.txt','w');
+fprintf(datafile,'%g\n',val); 
+fclose(datafile);
