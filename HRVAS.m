@@ -1803,7 +1803,6 @@ function HRVAS
         size(ECG)
         analyze_ecg=[];
         s = size(analyze_ecg)
-        mode
         if mode == 1
             analyze_ecg = ECG(:,2);
         elseif mode == 2
@@ -2137,7 +2136,8 @@ function HRVAS
             end
             raw_IBI = RR';
             [art, opt]=getHRV(raw_IBI,settings);
-
+            plotIBI(h,opt,IBI,dIBI,nIBI,trend,art);
+           showStatus('');
             
     %    else
         elseif strcmp(get(gcf,'SelectionType'),'normal')
@@ -2172,7 +2172,8 @@ function HRVAS
             [art, opt]=getHRV(raw_IBI,settings);
 
             fprintf('x=%f,y=%f\n',x,y);
-
+            plotIBI(h,opt,IBI,dIBI,nIBI,trend,art);
+           showStatus('');
         end
 
 
@@ -3190,14 +3191,14 @@ function HRVAS
         yn=nIBI(:,2);
         
         %plot IBI
-        if strcmpi(opt.ArtReplace,'none')
+        %if strcmpi(opt.ArtReplace,'none')
            plot(h.axesIBI,t,y,'.-')
            hold(h.axesIBI,'on');
            plot(h.axesIBI,t(art),y(art),'.r');
-        else %plot preprocessed ibi  
-           plot(h.axesIBI,tn,yn,'.-');
-           hold(h.axesIBI,'on');
-        end
+        %else %plot preprocessed ibi  
+        %   plot(h.axesIBI,tn,yn,'.-');
+        %   hold(h.axesIBI,'on');
+        %end
         
         %plot trend
         if ~strcmpi(opt.Detrend,'none')
@@ -3225,8 +3226,11 @@ function HRVAS
         ylabel(h.axesIBI,'IBI (s)');
         set(h.axesIBI,'xlim',xlim,'ylim',ylim, ...
             'xtick',xtick,'xticklabel',xticklabel)
-        slidervalue = get(h.slidercontrol,'value');
-        x1 = [slidervalue/500,slidervalue/500,slidervalue/500+showlength,slidervalue/500+showlength];
+        if showlength/size(ECG,1) < 0.5e-5
+            x1 = [showpos/500,showpos/500,showpos/500+size(ECG,1)*0.000005,showpos/500+size(ECG,1)*0.000005];
+        else
+            x1 = [showpos/500,showpos/500,showpos/500+showlength,showpos/500+showlength];
+        end
         y1 = [bgymax, bgymin, bgymin, bgymax];
         hold(h.axesIBI,'on');
         axes(h.axesIBI);
