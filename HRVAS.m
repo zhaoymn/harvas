@@ -55,6 +55,8 @@ function HRVAS
     global analyze_ibi analyze_nIBI analyze_dIBI;
     global analyze_ecg;
     global showpos;
+    global analyzemethod;
+    analyzemethod = 1;
     analyze_ecg = [];
     sample_covers = [];
     sample_selected = 0;
@@ -1689,6 +1691,7 @@ function HRVAS
     end
 
     function btnqu_Callback(hObject, eventdata)
+        analyzemethod = 1;
         firstplot = 0;
         showpos = 1;
         f=strtrim(get(h.txtFile,'String'));
@@ -1718,13 +1721,12 @@ function HRVAS
         showStatusECG('');
         flagPreviewed=true;
         raw_IBI=RR';
-        tic
         [art, opt]=getHRV(raw_IBI,settings);
-        toc                    
         end
     end
 
     function btnSVM_Callback(hObject, eventdata)
+        analyzemethod = 2;
         f=strtrim(get(h.txtFile,'String'));
         if ~isempty(f) || ~exist(f,'file')
             settings=getSettings; %get HRV options from gui
@@ -1752,13 +1754,12 @@ function HRVAS
         showStatusECG('');
         flagPreviewed=true;
         raw_IBI=RR';
-        tic
         [art, opt]=getHRV(raw_IBI,settings);
-        toc                    
         end
     end
 
     function btnPan_tompkin2_Callback(hObject, eventdata)
+        analyzemethod = 3;
         f=strtrim(get(h.txtFile,'String'));
         if ~isempty(f) || ~exist(f,'file')
             settings=getSettings; %get HRV options from gui
@@ -1787,13 +1788,12 @@ function HRVAS
         showStatusECG('');
         flagPreviewed=true;
         raw_IBI=RR';
-        tic
         [art, opt]=getHRV(raw_IBI,settings);
-        toc                    
         end
     end
 
     function btnPan_tompkin_Callback(hObject, eventdata)
+        analyzemethod = 4;
         f=strtrim(get(h.txtFile,'String'));
         if ~isempty(f) || ~exist(f,'file')
             settings=getSettings; %get HRV options from gui
@@ -1822,9 +1822,7 @@ function HRVAS
         showStatusECG('');
         flagPreviewed=true;
         raw_IBI=RR';
-        tic
         [art, opt]=getHRV(raw_IBI,settings);
-        toc                    
         end
     end
 
@@ -3310,7 +3308,15 @@ function HRVAS
     function output=analyzeQRS(new_ECG)
         gr=0;
         %[qrs_amp_raw,qrs_time_raw,qrs_i_raw,delay,RR]=pan_tompkin(ECG(:,2),sample_rate,gr);
-        [qrs_amp_raw,qrs_time_raw,qrs_i_raw,RR]= QRSdetection_qu(ECG(:,2),sample_rate);
+        if analyzemethod == 1
+            [qrs_amp_raw,qrs_time_raw,qrs_i_raw,RR]= QRSdetection_qu(new_ECG(:,2),sample_rate);
+        elseif analyzemethod == 2
+            [qrs_amp_raw,qrs_time_raw,qrs_i_raw,RR]= QRSdetection_qu(new_ECG(:,2),sample_rate);
+        elseif analyzemethod == 3
+            [qrs_amp_raw,qrs_time_raw,qrs_i_raw,RR]= pan_tompkin2(new_ECG(:,2),sample_rate);
+        else
+            [qrs_amp_raw,qrs_time_raw,qrs_i_raw,RR]= pan_tompkin(new_ECG(:,2),sample_rate);
+        end
         output.qrs=RR';
     end
 
